@@ -10,10 +10,17 @@ Created on Mon May  2 09:41:16 2022
 HW 2. custom assembly emulator
 """
 
+#ToDo:
+    #flags into enum
+    #output formatting
+    #input parsing for passing file
+    #GUI (low low priority)
+    #branching and stack (low low low priority)
+
 import re
 
 #code
-code_string = "ldi a,5\nldi b,10\nadd b\nadi 5"
+code_string = "ldi a,5\nldi b,10\nadd b\nst a,var1\nadi 5\nst a,var2"
 instructions = []
 
 #stack
@@ -104,5 +111,4 @@ for instruction in instructions:
         regs["a"] =  ~ int(instruction[1])
         continue
         
-        
-    #branching operations (this is where stack comes in)
+    #branching operations (this is where stack comes in) UNNEEDED

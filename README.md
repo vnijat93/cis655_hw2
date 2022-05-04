@@ -1,4 +1,4 @@
-# CIS 655 HW2
+# CIS 655 HW2 - DIY Instruction Sets
 
 ## Collaborator
 

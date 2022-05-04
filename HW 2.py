@@ -2,7 +2,10 @@
 """
 Created on Mon May  2 09:41:16 2022
 
-@author: natrium
+@authors: natrium
+          Varis
+          Christian
+          Luanqi
 
 HW 2. custom assembly emulator
 """
@@ -35,52 +38,71 @@ for instruction in instructions:
     
     #register operations
     if instruction[0] == "ld":
-        regs[instruction[1]] = regs[instruction[2]]
+        regs[instruction[1]] = int(regs[instruction[2]])
+        continue
     if instruction[0] == "ldi":
-        regs[instruction[1]] = instruction[2]
+        regs[instruction[1]] = int(instruction[2])
+        continue
     
     #arithmetic operations
     if instruction[0] == "add":
-        regs["a"] = regs["a"] + regs[instruction[1]] #add a and other reg (check bounds of register for error handling)
+        regs["a"] = int(regs["a"]) + int(regs[instruction[1]]) #add a and other reg (check bounds of register for error handling)
+        continue
     if instruction[0] == "adi":
-        regs["a"] = regs["a"] + instruction[1] #add reg a and immediate
+        regs["a"] = int(regs["a"]) + int(instruction[1]) #add reg a and immediate
+        continue
     if instruction[0] == "sub":
-        regs["a"] = regs["a"] - regs[instruction[1]] #subtract given reg from a and store in a
+        regs["a"] = int(regs["a"]) - int(regs[instruction[1]]) #subtract given reg from a and store in a
+        continue
     if instruction[0] == "subi":
-        regs["a"] = regs["a"] - instruction[1] #subtract immediate from reg a
+        regs["a"] = int(regs["a"]) - int(instruction[1]) #subtract immediate from reg a
+        continue
     if instruction[0] == "mul": 
-        regs["a"] = regs["a"] * regs[instruction[1]] #multiply a by given reg
+        regs["a"] = int(regs["a"]) * int(regs[instruction[1]]) #multiply a by given reg
+        continue
     if instruction[0] == "muli":
-        regs["a"] = regs["a"] * instruction[1] #multiply a by immediate
+        regs["a"] = int(regs["a"]) * int(instruction[1]) #multiply a by immediate
+        continue
         
     #data operations
     if instruction[0] == "st":
         mem[instruction[2]] = regs[instruction[1]]
+        continue
     if instruction[0] == "ld":
         regs[instruction[1]] = mem[instruction[2]]
+        continue
     
     #bitwise operations
     if instruction[0] == "shl":
-        regs[instruction[1]] = regs[instruction[1]] << instruction[2]
+        regs[instruction[1]] = int(regs[instruction[1]]) << int(instruction[2])
+        continue
     if instruction[0] == "shr":
-        regs[instruction[1]] = regs[instruction[1]] >> instruction[2]
+        regs[instruction[1]] = int(regs[instruction[1]]) >> int(instruction[2])
+        continue
     if instruction[0] == "and":
-        regs["a"] = regs["a"] & regs[instruction[1]]
+        regs["a"] = int(regs["a"]) & int(regs[instruction[1]])
+        continue
     if instruction[0] == "andi":
-        regs["a"] = regs["a"] & instruction[1]
+        regs["a"] = int(regs["a"]) & int(instruction[1])
+        continue
     if instruction[0] == "or":
-        regs["a"] = regs["a"] | regs[instruction[1]]
+        regs["a"] = int(regs["a"]) | int(regs[instruction[1]])
+        continue
     if instruction[0] == "ori":
-        regs["a"] = regs["a"] | instruction[1]
+        regs["a"] = int(regs["a"]) | int(instruction[1])
+        continue
     if instruction[0] == "xor":
-        regs["a"] = regs["a"] ^ regs[instruction[1]]
+        regs["a"] = int(regs["a"]) ^ int(regs[instruction[1]])
+        continue
     if instruction[0] == "xori":
-        regs["a"] = regs["a"] ^ instruction[1]
+        regs["a"] = int(regs["a"]) ^ int(instruction[1])
+        continue
     if instruction[0] == "comp":
-        regs["a"] =  ~ regs[instruction[1]]
+        regs["a"] =  ~ int(regs[instruction[1]])
+        continue
     if instruction[0] == "compi":
-        regs["a"] =  ~ instruction[1]
-        
+        regs["a"] =  ~ int(instruction[1])
+        continue
         
         
     #branching operations (this is where stack comes in)

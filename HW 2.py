@@ -12,6 +12,9 @@ HW 2. custom assembly emulator
 
 #ToDo:
     #flags into enum
+    #trigger flags when state
+    #comprehensive test program
+    #convert to binary opcodes and stuff. data.
     #output formatting
     #input parsing for passing file
     #GUI (low low priority)
@@ -20,7 +23,7 @@ HW 2. custom assembly emulator
 import re
 
 #code
-code_string = "ldi a,5\nldi b,10\nadd b\nst a,var1\nadi 5\nst a,var2"
+code_string = "ldi a,5\nldi b,10\nadd b\nst a,0001\nadi 5\nst a,0101"
 instructions = []
 
 #stack
@@ -34,7 +37,7 @@ remainder = False #remainder "bit" (for jump instructions)
 regs = {"a": "", "b": "", "c": ""}
 
 #memory
-mem = {} #dictionary. key is variable name, value is, well, value. should already be generically typed (ie. accept any variable type)
+mem = {"0001":"","0010":"","0011":"","0100":"","0101":"","0110":"","0111":"","1000":""} #dictionary. key is variable name, value is, well, value. should already be generically typed (ie. accept any variable type)
 
 #parse the code
 instructions = code_string.split("\n") #split based on line

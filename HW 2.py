@@ -12,12 +12,13 @@ HW 2. custom assembly emulator
 
 #ToDo:
     #flags into enum
-    #output formatting
     #input parsing for passing file
     #GUI (low low priority)
     #branching and stack (low low low priority)
 
 import re
+import sys
+import getopt
 
 from tabulate import tabulate
 from constants import (
@@ -25,8 +26,27 @@ from constants import (
     REGISTERS,
 )
 
-#code
-code_string = "ldi a,5\nldi b,10\nadd b\nst a,var1\nadi 5\nst a,var2"
+#parse input and import program from file
+argv = sys.argv
+arg_help = "-i, --input> - input file\n -h - help\n EXAMPLE: python \"HW 2.py\" -i test_program.txt"
+input_file = ""
+
+try:
+    opts, args = getopt.getopt(argv[1:], "hi:", ["help", "input="])
+except:
+    print(arg_help)
+    sys.exit(2)
+
+for opt,arg in opts:
+    if opt in ("-h", "--help"):
+        print(arg_help)
+        sys.exit(2)
+    if opt in ("-i", "--input"):
+        input_file = arg
+
+file = open(input_file,"r")
+code_string = file.read()
+
 instructions = []
 
 #stack
@@ -40,7 +60,7 @@ remainder = False #remainder "bit" (for jump instructions)
 regs = {"a": "", "b": "", "c": ""}
 
 #memory
-mem = {} #dictionary. key is variable name, value is, well, value. should already be generically typed (ie. accept any variable type)
+mem = {"0b01":0b000000,"0b10":0b000000,"0b11":0b000000} #dictionary. key is variable name, value is, well, value. should already be generically typed (ie. accept any variable type)
 
 #parse the code
 instructions = code_string.split("\n") #split based on line
@@ -52,90 +72,79 @@ def stringify(curr_step, register, instruction, mem=mem):
     data = []
     for k, v in register.items():
         v = 0 if v == "" else v
-        data.append([curr_step, f"${k}", f"{REGISTERS.get(k)}", '0x{0:0{1}X}'.format(v,8)])
-
+        data.append([curr_step, f"${k}", '0x{0:0{1}X}'.format(v,8), f"{REGISTERS.get(k)}", '0x{0:0{1}X}'.format(mem.get(REGISTERS.get(k)),8)])
     print("Registers:")
-    print(tabulate(data, headers=["Step", "Register", "Number", "Value"], tablefmt="pretty"))
-    print(f"Instruction: {instruction}")
-    print(f"OPCODE: {OPCODE.get(instruction[0])}")
-    print(f"Memory: {mem}")
+    print(tabulate(data, headers=["Step", "Register", "Value", "Memory", "Value"], tablefmt="pretty"))
+    print(f"Next Instruction: {instruction}")
+    print(f"OPCODE: {bin(OPCODE.get(instruction[0]))}")
     input("\nPress Enter to continue...\n")
     
 #interpret and run the code
 i = 0
+    
 for instruction in instructions:
 
     instruction = re.split(' |,| ,', instruction) #to hold different pieces of current instruction
-
-    stringify(i, regs, instruction)
-    i += 1
     
-    #register operations
-    if instruction[0] == "ld":
-        regs[instruction[1]] = int(regs[instruction[2]])
-        continue
-    if instruction[0] == "ldi":
-        regs[instruction[1]] = int(instruction[2])
-        continue
+    if i == 0:
+        #initial stringify
+        data = []
+        for k, v in regs.items():
+            v = 0 if v == "" else v
+            data.append([i, f"${k}", '0x{0:0{1}X}'.format(v,8), f"{REGISTERS.get(k)}", '0x{0:0{1}X}'.format(mem.get(REGISTERS.get(k)),8)])
+        print("Registers:")
+        print(tabulate(data, headers=["Step", "Register", "Value", "Memory", "Value"], tablefmt="pretty"))
+        print(f"Next Instruction: {instruction}")
+        print(f"OPCODE: {bin(OPCODE.get(instruction[0]))}")
+        input("\nPress Enter to continue...\n")
+    else:
+        stringify(i, regs, instruction)
+        i += 1
     
-    #arithmetic operations
-    if instruction[0] == "add":
-        regs["a"] = int(regs["a"]) + int(regs[instruction[1]]) #add a and other reg (check bounds of register for error handling)
-        continue
-    if instruction[0] == "adi":
-        regs["a"] = int(regs["a"]) + int(instruction[1]) #add reg a and immediate
-        continue
-    if instruction[0] == "sub":
-        regs["a"] = int(regs["a"]) - int(regs[instruction[1]]) #subtract given reg from a and store in a
-        continue
-    if instruction[0] == "subi":
-        regs["a"] = int(regs["a"]) - int(instruction[1]) #subtract immediate from reg a
-        continue
-    if instruction[0] == "mul": 
-        regs["a"] = int(regs["a"]) * int(regs[instruction[1]]) #multiply a by given reg
-        continue
-    if instruction[0] == "muli":
-        regs["a"] = int(regs["a"]) * int(instruction[1]) #multiply a by immediate
-        continue
-        
-    #data operations
-    if instruction[0] == "st":
-        mem[instruction[2]] = regs[instruction[1]]
-        continue
-    if instruction[0] == "ld":
-        regs[instruction[1]] = mem[instruction[2]]
-        continue
-    
-    #bitwise operations
-    if instruction[0] == "shl":
-        regs[instruction[1]] = int(regs[instruction[1]]) << int(instruction[2])
-        continue
-    if instruction[0] == "shr":
-        regs[instruction[1]] = int(regs[instruction[1]]) >> int(instruction[2])
-        continue
-    if instruction[0] == "and":
-        regs["a"] = int(regs["a"]) & int(regs[instruction[1]])
-        continue
-    if instruction[0] == "andi":
-        regs["a"] = int(regs["a"]) & int(instruction[1])
-        continue
-    if instruction[0] == "or":
-        regs["a"] = int(regs["a"]) | int(regs[instruction[1]])
-        continue
-    if instruction[0] == "ori":
-        regs["a"] = int(regs["a"]) | int(instruction[1])
-        continue
-    if instruction[0] == "xor":
-        regs["a"] = int(regs["a"]) ^ int(regs[instruction[1]])
-        continue
-    if instruction[0] == "xori":
-        regs["a"] = int(regs["a"]) ^ int(instruction[1])
-        continue
-    if instruction[0] == "comp":
-        regs["a"] =  ~ int(regs[instruction[1]])
-        continue
-    if instruction[0] == "compi":
-        regs["a"] =  ~ int(instruction[1])
-        continue
+    match int(OPCODE.get(instruction[0])):
+        #register operations
+        case 0b000001:
+            regs[instruction[1]] = int(regs[instruction[2]])
+        case 0b000010:
+            regs[instruction[1]] = int(instruction[2])
+        #arithmetic operations
+        case 0b000011:
+            regs["a"] = int(regs["a"]) + int(regs[instruction[1]]) #add a and other reg (check bounds of register for error handling)
+        case 0b000100:
+           regs["a"] = int(regs["a"]) + int(instruction[1]) #add reg a and immediate
+        case 0b000101:
+            regs["a"] = int(regs["a"]) - int(regs[instruction[1]]) #subtract given reg from a and store in a
+        case 0b000110:
+            regs["a"] = int(regs["a"]) - int(instruction[1]) #subtract immediate from reg a
+        case 0b000111:
+            regs["a"] = int(regs["a"]) * int(regs[instruction[1]]) #multiply a by given reg
+        case 0b001000:
+            regs["a"] = int(regs["a"]) * int(instruction[1]) #multiply a by immediate
+        #data operations
+        case 0b001001:
+            mem[instruction[2]] = int(regs[instruction[1]])
+        case 0b001010:
+            regs[instruction[1]] = mem[instruction[2]]
+        #bitwise operations
+        case 0b001011:
+            regs[instruction[1]] = int(regs[instruction[1]]) << int(instruction[2])
+        case 0b001100:
+            regs[instruction[1]] = int(regs[instruction[1]]) >> int(instruction[2])
+        case 0b001101:
+            regs["a"] = int(regs["a"]) & int(regs[instruction[1]])
+        case 0b001110:
+            regs["a"] = int(regs["a"]) & int(instruction[1])
+        case 0b001111:
+            regs["a"] = int(regs["a"]) | int(regs[instruction[1]])
+        case 0b010000:
+            regs["a"] = int(regs["a"]) | int(instruction[1])
+        case 0b010001:
+            regs["a"] = int(regs["a"]) ^ int(regs[instruction[1]])
+        case 0b010010:
+            regs["a"] = int(regs["a"]) ^ int(instruction[1])
+        case 0b010010:
+            regs["a"] =  ~ int(regs[instruction[1]])
+        case 0b010010:
+            regs["a"] =  ~ int(instruction[1])
         
     #branching operations (this is where stack comes in) UNNEEDED

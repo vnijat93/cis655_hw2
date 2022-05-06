@@ -75,31 +75,19 @@ def stringify(curr_step, register, instruction, mem=mem):
         data.append([curr_step, f"${k}", '0x{0:0{1}X}'.format(v,8), f"{REGISTERS.get(k)}", '0x{0:0{1}X}'.format(mem.get(REGISTERS.get(k)),8)])
     print("Registers:")
     print(tabulate(data, headers=["Step", "Register", "Value", "Memory", "Value"], tablefmt="pretty"))
-    print(f"Next Instruction: {instruction}")
+    print(f"Instruction: {instruction}")
     print(f"OPCODE: {bin(OPCODE.get(instruction[0]))}")
     input("\nPress Enter to continue...\n")
     
 #interpret and run the code
 i = 0
+
+#initial state
+stringify(i, regs, ["noop"])
     
 for instruction in instructions:
 
     instruction = re.split(' |,| ,', instruction) #to hold different pieces of current instruction
-    
-    if i == 0:
-        #initial stringify
-        data = []
-        for k, v in regs.items():
-            v = 0 if v == "" else v
-            data.append([i, f"${k}", '0x{0:0{1}X}'.format(v,8), f"{REGISTERS.get(k)}", '0x{0:0{1}X}'.format(mem.get(REGISTERS.get(k)),8)])
-        print("Registers:")
-        print(tabulate(data, headers=["Step", "Register", "Value", "Memory", "Value"], tablefmt="pretty"))
-        print(f"Next Instruction: {instruction}")
-        print(f"OPCODE: {bin(OPCODE.get(instruction[0]))}")
-        input("\nPress Enter to continue...\n")
-    else:
-        stringify(i, regs, instruction)
-        i += 1
     
     match int(OPCODE.get(instruction[0])):
         #register operations
@@ -148,3 +136,6 @@ for instruction in instructions:
             regs["a"] =  ~ int(instruction[1])
         
     #branching operations (this is where stack comes in) UNNEEDED
+    
+    stringify(i, regs, instruction)
+    i += 1

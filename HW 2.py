@@ -20,6 +20,10 @@ HW 2. custom assembly emulator
 import re
 
 from tabulate import tabulate
+from constants import (
+    OPCODE,
+    REGISTERS,
+)
 
 #code
 code_string = "ldi a,5\nldi b,10\nadd b\nst a,var1\nadi 5\nst a,var2"
@@ -42,24 +46,29 @@ mem = {} #dictionary. key is variable name, value is, well, value. should alread
 instructions = code_string.split("\n") #split based on line
 
 
-def stringify(curr_step, register, instruction):
+def stringify(curr_step, register, instruction, mem=mem):
     """A function to stringify the register object
     """
     data = []
     for k, v in register.items():
         v = 0 if v == "" else v
-        data.append([curr_step, f"${k}", '0x{0:0{1}X}'.format(v,8)])
-    print(f"\n{instruction}")
-    print(tabulate(data, headers=["Step", "Register", "Value"], tablefmt="pretty"))
-    input("\nPress Enter to continue...")
+        data.append([curr_step, f"${k}", f"{REGISTERS.get(k)}", '0x{0:0{1}X}'.format(v,8)])
+
+    print("Registers:")
+    print(tabulate(data, headers=["Step", "Register", "Number", "Value"], tablefmt="pretty"))
+    print(f"Instruction: {instruction}")
+    print(f"OPCODE: {OPCODE.get(instruction[0])}")
+    print(f"Memory: {mem}")
+    input("\nPress Enter to continue...\n")
     
 #interpret and run the code
 i = 0
 for instruction in instructions:
 
+    instruction = re.split(' |,| ,', instruction) #to hold different pieces of current instruction
+
     stringify(i, regs, instruction)
     i += 1
-    instruction = re.split(' |,| ,', instruction) #to hold different pieces of current instruction
     
     #register operations
     if instruction[0] == "ld":

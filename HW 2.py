@@ -19,6 +19,7 @@ HW 2. custom assembly emulator
 import re
 import sys
 import getopt
+import os
 
 from tabulate import tabulate
 from constants import (
@@ -69,6 +70,7 @@ instructions = code_string.split("\n") #split based on line
 def stringify(curr_step, register, instruction, mem=mem):
     """A function to stringify the register object
     """
+    os.system('cls')
     data = []
     for k, v in register.items():
         v = 0 if v == "" else v

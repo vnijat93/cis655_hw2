@@ -22,10 +22,37 @@ import getopt
 import os
 
 from tabulate import tabulate
-from constants import (
-    OPCODE,
-    REGISTERS,
-)
+
+#constants
+OPCODE = {
+    "ld": 0b000001,
+    "ldi": 0b000010,
+    "add": 0b000011,
+    "adi": 0b000100,
+    "sub": 0b000101,
+    "subi": 0b000110,
+    "mul": 0b000111,
+    "muli": 0b001000,
+    "st": 0b001001,
+    "ld": 0b001010,
+    "shl": 0b001011,
+    "shr": 0b001100,
+    "and": 0b001101,
+    "andi": 0b001110,
+    "or": 0b001111,
+    "ori": 0b010000,
+    "xor": 0b010001,
+    "xori": 0b010010,
+    "comp": 0b010010,
+    "compi": 0b010010,
+    "noop": 0b010011,
+}
+
+REGISTERS = {
+    "a": "0b01",
+    "b": "0b10",
+    "c": "0b11",
+}
 
 #parse input and import program from file
 argv = sys.argv
@@ -58,7 +85,7 @@ overflow = False #overflow "bit"
 remainder = False #remainder "bit" (for jump instructions)
 
 #registers (just three, cause it's my favorite number). dictionary, key is register, value is register value
-regs = {"a": "", "b": "", "c": ""}
+regs = {"a": 0b00, "b": 0b00, "c": 0b00}
 
 #memory
 mem = {"0b01":0b000000,"0b10":0b000000,"0b11":0b000000} #dictionary. key is variable name, value is, well, value. should already be generically typed (ie. accept any variable type)
@@ -78,6 +105,7 @@ def stringify(curr_step, register, instruction, mem=mem):
     print("Registers:")
     print(tabulate(data, headers=["Step", "Register", "Value", "Memory", "Value"], tablefmt="pretty"))
     print(f"Instruction: {instruction}")
+    print(f"object file: {OPCODE.get(instruction[0])}")
     print(f"OPCODE: {bin(OPCODE.get(instruction[0]))}")
     input("\nPress Enter to continue...\n")
     
@@ -127,6 +155,7 @@ for instruction in instructions:
         case 0b001111:
             regs["a"] = int(regs["a"]) | int(regs[instruction[1]])
         case 0b010000:
+            print(type(regs["a"]))
             regs["a"] = int(regs["a"]) | int(instruction[1])
         case 0b010001:
             regs["a"] = int(regs["a"]) ^ int(regs[instruction[1]])

@@ -4,3 +4,6 @@ add b
 st a,0b01
 adi 5
 st a,0b10
+ori 22
+st a,0b11
+shl b,4
